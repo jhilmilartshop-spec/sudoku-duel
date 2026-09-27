@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku Duel — a two-player puzzle room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14172b;
+    --bg-alt: #1c2142;
+    --panel: #f4f1fb;
+    --panel-line: #cfc9e8;
+    --given: #e3ddf5;
+    --ink: #eeecf9;
+    --muted: #9490b8;
+    --p1: #f0a35c;
+    --p1-soft: #f0a35c33;
+    --p2: #49c2b5;
+    --p2-soft: #49c2b533;
+    --danger: #ef6c86;
+    --danger-soft: #ef6c8633;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 20% -10%, #232951 0%, var(--bg) 55%);
+    color: var(--ink);
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+  }
+  h1,h2,h3, .display{
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+  button{
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+  }
+  input{
+    font-family: inherit;
+  }
+  .screen{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+  .hidden{ display:none !important; }
+
+  /* ---------- Landing ---------- */
+  .hero{
+    text-align: left;
+    margin-bottom: 34px;
+  }
+  .hero .kicker{
+    color: var(--p2);
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+  }
+  .hero h1{
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.05;
+  }
+  .hero p{
+    color: var(--muted);
+    max-width: 46ch;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .card{
+    background: var(--bg-alt);
+    border: 1px solid #2c3260;
+    border-radius: var(--radius);
+    padding: 26px;
+  }
+  .setup-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 18px;
+  }
+  .field{
+    display:flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field.full{ grid-column: 1 / -1; }
+  .field label{
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .field input[type=text]{
+    background: #10132a;
+    border: 1px solid #34397a;
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--ink);
+    font-size: 1rem;
+    outline: none;
+  }
+  .field input[type=text]:focus{ border-color: var(--p2); }
+  .player-field input{ border-left: 3px solid var(--p1); }
+  .player-field.two input{ border-left: 3px solid var(--p2); }
+
+  .difficulty-row{
+    display:flex;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .diff-btn{
+    background: #10132a;
+    border: 1px solid #34397a;
+    color: var(--muted);
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.88rem;
+  }
+  .diff-btn.active{
+    background: var(--p2-soft);
+    border-color: var(--p2);
+    color: var(--ink);
+  }
+  .start-btn{
+    margin-top: 22px;
+    width: 100%;
+    background: linear-gradient(120deg, var(--p1), var(--p2));
+    color: #14172b;
+    font-weight: 600;
+    font-size: 1.05rem;
+    padding: 15px;
+    border-radius: 12px;
+    transition: transform .15s ease;
+  }
+  .start-btn:hover{ transform: translateY(-1px); }
+  .start-btn:active{ transform: translateY(0); }
+
+  .rooms-section{ margin-top: 30px; }
+  .rooms-section h2{ font-size: 1.15rem; margin-bottom: 4px; }
+  .rooms-section .sub{ color: var(--muted); font-size: 0.88rem; margin-bottom: 14px; }
+  .room-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    background: var(--bg-alt);
+    border: 1px solid #2c3260;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .room-row .meta{ display:flex; flex-direction: column; gap: 3px; }
+  .room-row .meta .name{ font-weight: 600; }
+  .room-row .meta .sub{ color: var(--muted); font-size: 0.8rem; }
+  .room-row .actions{ display:flex; gap: 8px; }
+  .pill-btn{
+    background: #10132a;
+    border: 1px solid #34397a;
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+  }
+  .pill-btn.danger{ border-color: var(--danger); color: var(--danger); }
+  .pill-btn:hover{ border-color: var(--p2); }
+  .empty-note{ color: var(--muted); font-size: 0.88rem; }
+
+  /* ---------- Game screen ---------- */
+  .game-top{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .game-top .room-title{ font-size: 1.4rem; }
+  .game-top .room-title span{ color: var(--muted); font-size: 0.85rem; font-family:'Space Grotesk',sans-serif; display:block; margin-top:2px;}
+  .top-actions{ display:flex; gap: 8px; flex-wrap: wrap; }
+
+  .boards{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+  @media (max-width: 800px){
+    .boards{ grid-template-columns: 1fr; }
+    .vs-divider{ display:none; }
+  }
+  .vs-divider{
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    gap: 10px;
+    padding-top: 90px;
+    color: var(--muted);
+  }
+  .vs-divider .line{ width:1px; flex:1; background: #2c3260; }
+  .vs-divider .vs-label{
+    font-family:'Fraunces',serif;
+    font-size: 0.95rem;
+  }
+
+  .panel{
+    background: var(--bg-alt);
+    border: 1px solid #2c3260;
+    border-radius: var(--radius);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .panel.solved{ border-color: var(--p2); }
+  .panel-head{
+    display:flex;
+    justify-content: space-between;
+    align-items:flex-start;
+    margin-bottom: 14px;
+  }
+  .panel-head .pname{
+    font-family:'Fraunces',serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  .panel.p1 .pname{ color: var(--p1); }
+  .panel.p2 .pname{ color: var(--p2); }
+  .panel-head .status{
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .timer{
+    font-variant-numeric: tabular-nums;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .timer.win{ color: var(--p2); }
+
+  .grid9{
+    display:grid;
+    grid-template-columns: repeat(9, 1fr);
+    background: var(--panel-line);
+    gap: 1px;
+    border: 2px solid var(--panel-line);
+    border-radius: 6px;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+  }
+  .cell{
+    background: var(--panel);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: clamp(0.85rem, 2.6vw, 1.15rem);
+    color: #262047;
+    font-weight: 500;
+    position: relative;
+    user-select: none;
+  }
+  .cell.given{ background: var(--given); font-weight: 700; color: #1a1638; }
+  .cell.editable{ cursor: pointer; }
+  .cell.editable:hover{ background: #eae5fb; }
+  .cell.selected{ outline: 2px solid var(--p1); outline-offset: -2px; z-index: 2; }
+  .panel.p2 .cell.selected{ outline-color: var(--p2); }
+  .cell.conflict{ background: var(--danger-soft); color: var(--danger); }
+  .cell.correct-fill{ color: #1a1638; }
+  .cell:nth-child(3n){ border-right: 2px solid var(--panel-line); }
+  .cell:nth-child(9n){ border-right: none; }
+  .row-thick{ border-bottom: 2px solid var(--panel-line); }
+
+  .numpad{
+    display:grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .numpad button{
+    background: #10132a;
+    border: 1px solid #34397a;
+    color: var(--ink);
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+  .numpad button:hover{ border-color: var(--p2); }
+  .numpad button.erase{ grid-column: span 3; color: var(--muted); font-size: 0.8rem; }
+
+  .win-banner{
+    margin-top: 24px;
+    padding: 22px;
+    border-radius: var(--radius);
+    background: linear-gradient(120deg, var(--p1-soft), var(--p2-soft));
+    border: 1px solid #2c3260;
+    text-align:center;
+  }
+  .win-banner h2{ font-size: 1.5rem; margin-bottom: 6px; }
+  .win-banner p{ color: var(--muted); margin: 0 0 16px; }
+  .win-banner .again-btn{
+    background: var(--ink);
+    color: #14172b;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  #confetti-canvas{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  .top-back{
+    color: var(--muted);
+    background: none;
+    font-size: 0.85rem;
+    padding: 6px 0;
+  }
+  .top-back:hover{ color: var(--ink); }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ===================== LANDING SCREEN ===================== -->
+<div class="screen" id="landing-screen">
+  <div class="hero">
+    <div class="kicker">a small game room for two</div>
+    <h1>Sudoku Duel</h1>
+    <p>Sit side by side, each take a board, and see who fills theirs first. Name your room to save it — come back and pick up right where you left off.</p>
+  </div>
+
+  <div class="card">
+    <div class="field full">
+      <label for="room-name">Room name</label>
+      <input type="text" id="room-name" placeholder="e.g. Sunday morning coffee" maxlength="40">
+    </div>
+    <div class="setup-grid">
+      <div class="field player-field one">
+        <label for="p1-name">Player 1</label>
+        <input type="text" id="p1-name" placeholder="Your name" maxlength="20">
+      </div>
+      <div class="field player-field two">
+        <label for="p2-name">Player 2</label>
+        <input type="text" id="p2-name" placeholder="Their name" maxlength="20">
+      </div>
+    </div>
+    <div class="field full" style="margin-top:16px;">
+      <label>Difficulty</label>
+      <div class="difficulty-row" id="difficulty-row">
+        <button class="diff-btn" data-diff="easy">Easy</button>
+        <button class="diff-btn active" data-diff="medium">Medium</button>
+        <button class="diff-btn" data-diff="hard">Hard</button>
+      </div>
+    </div>
+    <button class="start-btn" id="start-btn">Start new round</button>
+  </div>
+
+  <div class="rooms-section">
+    <h2>Your rooms</h2>
+    <div class="sub">Saved games on this device</div>
+    <div id="rooms-list"></div>
+  </div>
+</div>
+
+<!-- ===================== GAME SCREEN ===================== -->
+<div class="screen hidden" id="game-screen">
+  <button class="top-back" id="back-btn">&larr; all rooms</button>
+  <div class="game-top">
+    <div class="room-title" id="game-room-title">Room<span id="game-room-sub">medium · 0 clues</span></div>
+    <div class="top-actions">
+      <button class="pill-btn" id="pause-btn">Pause</button>
+      <button class="pill-btn" id="newpuzzle-btn">New puzzle</button>
+    </div>
+  </div>
+
+  <div class="boards">
+    <div class="panel p1" id="panel-p1">
+      <div class="panel-head">
+        <div>
+          <div class="pname" id="p1-label">Player 1</div>
+          <div class="status" id="p1-status">playing</div>
+        </div>
+        <div class="timer" id="p1-timer">00:00</div>
+      </div>
+      <div class="grid9" id="grid-p1"></div>
+      <div class="numpad" id="numpad-p1"></div>
+    </div>
+
+    <div class="vs-divider">
+      <div class="line"></div>
+      <div class="vs-label">vs</div>
+      <div class="line"></div>
+    </div>
+
+    <div class="panel p2" id="panel-p2">
+      <div class="panel-head">
+        <div>
+          <div class="pname" id="p2-label">Player 2</div>
+          <div class="status" id="p2-status">playing</div>
+        </div>
+        <div class="timer" id="p2-timer">00:00</div>
+      </div>
+      <div class="grid9" id="grid-p2"></div>
+      <div class="numpad" id="numpad-p2"></div>
+    </div>
+  </div>
+
+  <div class="win-banner hidden" id="win-banner">
+    <h2 id="win-title">Both boards solved!</h2>
+    <p id="win-sub"></p>
+    <button class="again-btn" id="again-btn">Play again in this room</button>
+  </div>
+</div>
+
+<script>
+(function(){
+
+/* ================= SUDOKU ENGINE ================= */
+function emptyGrid(){ return Array.from({length:9}, () => Array(9).fill(0)); }
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function isSafe(grid,row,col,val){
+  for(let i=0;i<9;i++){
+    if(grid[row][i]===val) return false;
+    if(grid[i][col]===val) return false;
+  }
+  const br=row-row%3, bc=col-col%3;
+  for(let r=0;r<3;r++) for(let c=0;c<3;c++){
+    if(grid[br+r][bc+c]===val) return false;
+  }
+  return true;
+}
+
+function fillGrid(grid){
+  for(let pos=0; pos<81; pos++){
+    const row = Math.floor(pos/9), col = pos%9;
+    if(grid[row][col]!==0) continue;
+    const nums = shuffle([1,2,3,4,5,6,7,8,9]);
+    for(const n of nums){
+      if(isSafe(grid,row,col,n)){
+        grid[row][col]=n;
+        if(fillGrid(grid)) return true;
+        grid[row][col]=0;
+      }
+    }
+    return false;
+  }
+  return true;
+}
+
+function generateSolvedGrid(){
+  const grid = emptyGrid();
+  fillGrid(grid);
+  return grid;
+}
+
+const CLUES = { easy: 42, medium: 32, hard: 26 };
+
+function generatePuzzle(difficulty){
+  const solution = generateSolvedGrid();
+  const puzzle = solution.map(r=>r.slice());
+  const clueTarget = CLUES[difficulty] || CLUES.medium;
+  let cellsToRemove = 81 - clueTarget;
+  const positions = shuffle(Array.from({length:81}, (_,i)=>i));
+  let idx = 0;
+  while(cellsToRemove>0 && idx<positions.length){
+    const pos = positions[idx++];
+    const r = Math.floor(pos/9), c = pos%9;
+    if(puzzle[r][c]!==0){
+      puzzle[r][c]=0;
+      cellsToRemove--;
+    }
+  }
+  return { puzzle, solution };
+}
+
+function makePlayerState(difficulty){
+  const {puzzle, solution} = generatePuzzle(difficulty);
+  const given = puzzle.map(row => row.map(v => v!==0));
+  return {
+    puzzle,
+    solution,
+    given,
+    entries: puzzle.map(r=>r.slice()),
+    elapsedMs: 0,
+    running: false,
+    solved: false,
+    solvedAt: null
+  };
+}
+
+/* ================= STORAGE ================= */
+const INDEX_KEY = 'sudokuDuel_roomIndex';
+const ROOM_PREFIX = 'sudokuDuel_room_';
+
+function loadIndex(){
+  try{ return JSON.parse(localStorage.getItem(INDEX_KEY)) || []; }
+  catch(e){ return []; }
+}
+function saveIndex(list){ localStorage.setItem(INDEX_KEY, JSON.stringify(list)); }
+
+function loadRoom(name){
+  try{ return JSON.parse(localStorage.getItem(ROOM_PREFIX+name)); }
+  catch(e){ return null; }
+}
+function saveRoom(room){
+  localStorage.setItem(ROOM_PREFIX+room.roomName, JSON.stringify(room));
+  let idx = loadIndex().filter(n => n !== room.roomName);
+  idx.unshift(room.roomName);
+  saveIndex(idx);
+}
+function deleteRoom(name){
+  localStorage.removeItem(ROOM_PREFIX+name);
+  saveIndex(loadIndex().filter(n => n !== name));
+}
+
+/* ================= APP STATE ================= */
+let currentRoom = null;
+let selected = { p1: null, p2: null };
+let tickHandle = null;
+
+const landingScreen = document.getElementById('landing-screen');
+const gameScreen = document.getElementById('game-screen');
+
+/* ---------- Landing rendering ---------- */
+let chosenDiff = 'medium';
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    chosenDiff = btn.dataset.diff;
+  });
+});
+
+function fmtTime(ms){
+  const totalSec = Math.floor(ms/1000);
+  const m = Math.floor(totalSec/60).toString().padStart(2,'0');
+  const s = (totalSec%60).toString().padStart(2,'0');
+  return m+':'+s;
+}
+
+function renderRoomsList(){
+  const wrap = document.getElementById('rooms-list');
+  const names = loadIndex();
+  if(names.length===0){
+    wrap.innerHTML = '<div class="empty-note">No saved rooms yet — start one above.</div>';
+    return;
+  }
+  wrap.innerHTML = '';
+  names.forEach(name=>{
+    const room = loadRoom(name);
+    if(!room) return;
+    const row = document.createElement('div');
+    row.className = 'room-row';
+    const bothSolved = room.player1.solved && room.player2.solved;
+    const sub = bothSolved
+      ? 'finished · ' + room.player1.name + ' ' + fmtTime(room.player1.elapsedMs) + ' · ' + room.player2.name + ' ' + fmtTime(room.player2.elapsedMs)
+      : room.difficulty + ' · ' + room.player1.name + ' & ' + room.player2.name;
+    row.innerHTML = `
+      <div class="meta">
+        <div class="name">${escapeHtml(room.roomName)}</div>
+        <div class="sub">${escapeHtml(sub)}</div>
+      </div>
+      <div class="actions">
+        <button class="pill-btn" data-open="${escapeAttr(name)}">Resume</button>
+        <button class="pill-btn danger" data-del="${escapeAttr(name)}">Delete</button>
+      </div>`;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('[data-open]').forEach(b=>{
+    b.addEventListener('click', ()=> openRoom(b.dataset.open));
+  });
+  wrap.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(confirm('Delete this room? This can\'t be undone.')){
+        deleteRoom(b.dataset.del);
+        renderRoomsList();
+      }
+    });
+  });
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+function escapeAttr(str){ return escapeHtml(str); }
+
+document.getElementById('start-btn').addEventListener('click', ()=>{
+  let roomName = document.getElementById('room-name').value.trim();
+  let p1 = document.getElementById('p1-name').value.trim() || 'Player 1';
+  let p2 = document.getElementById('p2-name').value.trim() || 'Player 2';
+  if(!roomName){
+    roomName = p1 + ' & ' + p2 + ' — ' + new Date().toLocaleDateString();
+  }
+  const existing = loadRoom(roomName);
+  if(existing && !confirm('A room called "'+roomName+'" already exists. Overwrite it with a fresh round?')){
+    return;
+  }
+  const room = {
+    roomName,
+    difficulty: chosenDiff,
+    createdAt: Date.now(),
+    player1: Object.assign(makePlayerState(chosenDiff), {name: p1}),
+    player2: Object.assign(makePlayerState(chosenDiff), {name: p2})
+  };
+  saveRoom(room);
+  openRoom(roomName);
+});
+
+function openRoom(name){
+  const room = loadRoom(name);
+  if(!room) return;
+  currentRoom = room;
+  selected = { p1: null, p2: null };
+  landingScreen.classList.add('hidden');
+  gameScreen.classList.remove('hidden');
+  document.getElementById('win-banner').classList.add('hidden');
+  document.getElementById('game-room-title').firstChild.textContent = room.roomName + ' ';
+  document.getElementById('game-room-sub').textContent = room.difficulty + ' · ' + (81 - countBlanks(room.player1.given)) + ' starting clues';
+  document.getElementById('p1-label').textContent = room.player1.name;
+  document.getElementById('p2-label').textContent = room.player2.name;
+  buildBoard('p1');
+  buildBoard('p2');
+  buildNumpad('p1');
+  buildNumpad('p2');
+  refreshBoard('p1');
+  refreshBoard('p2');
+  updatePauseButton();
+  // resume timers if the room was mid-play and not solved
+  if(!room.player1.solved) room.player1.running = true;
+  if(!room.player2.solved) room.player2.running = true;
+  startTicking();
+  checkOverallWin(false);
+}
+
+function countBlanks(givenGrid){
+  let n = 0;
+  givenGrid.forEach(row => row.forEach(v => { if(!v) n++; }));
+  return n;
+}
+
+document.getElementById('back-btn').addEventListener('click', ()=>{
+  stopTicking();
+  if(currentRoom) saveRoom(currentRoom);
+  gameScreen.classList.add('hidden');
+  landingScreen.classList.remove('hidden');
+  renderRoomsList();
+});
+
+/* ---------- Board building & rendering ---------- */
+function buildBoard(key){
+  const grid = document.getElementById('grid-'+key);
+  grid.innerHTML = '';
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      if(r===2||r===5) cell.classList.add('row-thick');
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      cell.addEventListener('click', ()=> selectCell(key, r, c));
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function buildNumpad(key){
+  const pad = document.getElementById('numpad-'+key);
+  pad.innerHTML = '';
+  for(let n=1;n<=9;n++){
+    const btn = document.createElement('button');
+    btn.textContent = n;
+    btn.addEventListener('click', ()=> enterValue(key, n));
+    pad.appendChild(btn);
+  }
+  const erase = document.createElement('button');
+  erase.textContent = 'Erase';
+  erase.className = 'erase';
+  erase.addEventListener('click', ()=> enterValue(key, 0));
+  pad.appendChild(erase);
+}
+
+function selectCell(key, r, c){
+  const player = currentRoom[fullKey(key)];
+  if(player.given[r][c] || player.solved) return;
+  selected[key] = {r,c};
+  refreshBoard(key);
+}
+
+function fullKey(key){ return key==='p1' ? 'player1' : 'player2'; }
+
+function enterValue(key, val){
+  const sel = selected[key];
+  if(!sel) return;
+  const player = currentRoom[fullKey(key)];
+  if(player.given[sel.r][sel.c] || player.solved) return;
+  player.entries[sel.r][sel.c] = val;
+  refreshBoard(key);
+  checkPlayerWin(key);
+  saveRoom(currentRoom);
+}
+
+document.addEventListener('keydown', (e)=>{
+  ['p1','p2'].forEach(key=>{
+    if(!selected[key]) return;
+    if(!document.activeElement || document.activeElement === document.body){
+      // fine, keyboard applies globally to whichever cell was last clicked per board
+    }
+  });
+  const digit = e.key >= '1' && e.key <= '9' ? parseInt(e.key,10) : null;
+  const isErase = e.key === 'Backspace' || e.key === 'Delete' || e.key === '0';
+  if(!digit && !isErase) return;
+  // apply to whichever board's selection was most recently touched
+  if(lastTouched && selected[lastTouched]){
+    enterValue(lastTouched, digit || 0);
+  }
+});
+let lastTouched = null;
+['p1','p2'].forEach(key=>{
+  document.getElementById('grid-'+key).addEventListener('click', ()=> lastTouched = key);
+});
+
+function conflictsFor(entries, r, c, val){
+  if(!val) return false;
+  for(let i=0;i<9;i++){
+    if(i!==c && entries[r][i]===val) return true;
+    if(i!==r && entries[i][c]===val) return true;
+  }
+  const br=r-r%3, bc=c-c%3;
+  for(let rr=0;rr<3;rr++) for(let cc=0;cc<3;cc++){
+    const gr=br+rr, gc=bc+cc;
+    if((gr!==r||gc!==c) && entries[gr][gc]===val) return true;
+  }
+  return false;
+}
+
+function refreshBoard(key){
+  const player = currentRoom[fullKey(key)];
+  const grid = document.getElementById('grid-'+key);
+  const cells = grid.children;
+  for(let r=0;r<9;r++){
+    for(let c=0;c<9;c++){
+      const cell = cells[r*9+c];
+      const val = player.entries[r][c];
+      cell.textContent = val || '';
+      cell.classList.toggle('given', !!player.given[r][c]);
+      cell.classList.toggle('editable', !player.given[r][c] && !player.solved);
+      const isSel = selected[key] && selected[key].r===r && selected[key].c===c;
+      cell.classList.toggle('selected', !!isSel);
+      const conflict = !player.given[r][c] && conflictsFor(player.entries, r, c, val);
+      cell.classList.toggle('conflict', conflict);
+    }
+  }
+  document.getElementById(key+'-status').textContent = player.solved
+    ? 'solved!'
+    : 'playing';
+  document.getElementById('panel-'+key).classList.toggle('solved', player.solved);
+}
+
+/* ---------- Timers ---------- */
+function startTicking(){
+  stopTicking();
+  let last = Date.now();
+  tickHandle = setInterval(()=>{
+    const now = Date.now();
+    const delta = now - last;
+    last = now;
+    let changed = false;
+    ['player1','player2'].forEach(pk=>{
+      const player = currentRoom[pk];
+      if(player.running && !player.solved){
+        player.elapsedMs += delta;
+        changed = true;
+      }
+    });
+    document.getElementById('p1-timer').textContent = fmtTime(currentRoom.player1.elapsedMs);
+    document.getElementById('p2-timer').textContent = fmtTime(currentRoom.player2.elapsedMs);
+    if(changed && Math.floor(currentRoom.player1.elapsedMs/2000) !== lastSaveTick){
+      lastSaveTick = Math.floor(currentRoom.player1.elapsedMs/2000);
+      saveRoom(currentRoom);
+    }
+  }, 250);
+}
+let lastSaveTick = -1;
+function stopTicking(){
+  if(tickHandle){ clearInterval(tickHandle); tickHandle = null; }
+}
+
+document.getElementById('pause-btn').addEventListener('click', ()=>{
+  if(!currentRoom) return;
+  const anyRunning = currentRoom.player1.running || currentRoom.player2.running;
+  const nowRunning = !anyRunning;
+  if(!currentRoom.player1.solved) currentRoom.player1.running = nowRunning;
+  if(!currentRoom.player2.solved) currentRoom.player2.running = nowRunning;
+  updatePauseButton();
+  saveRoom(currentRoom);
+});
+function updatePauseButton(){
+  const btn = document.getElementById('pause-btn');
+  const anyRunning = currentRoom.player1.running || currentRoom.player2.running;
+  btn.textContent = anyRunning ? 'Pause' : 'Resume';
+}
+
+/* ---------- Win detection ---------- */
+function boardMatchesSolution(player){
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    if(player.entries[r][c] !== player.solution[r][c]) return false;
+  }
+  return true;
+}
+
+function checkPlayerWin(key){
+  const player = currentRoom[fullKey(key)];
+  if(player.solved) return;
+  if(boardMatchesSolution(player)){
+    player.solved = true;
+    player.running = false;
+    player.solvedAt = Date.now();
+    document.getElementById(key+'-timer').classList.add('win');
+    refreshBoard(key);
+    burstConfettiFromPanel('panel-'+key);
+    checkOverallWin(true);
+  }
+}
+
+function checkOverallWin(justHappened){
+  if(!currentRoom.player1.solved || !currentRoom.player2.solved) return;
+  const banner = document.getElementById('win-banner');
+  banner.classList.remove('hidden');
+  const t1 = currentRoom.player1.elapsedMs, t2 = currentRoom.player2.elapsedMs;
+  let title, sub;
+  if(Math.abs(t1-t2) < 1000){
+    title = "It's a tie!";
+    sub = currentRoom.player1.name + ' and ' + currentRoom.player2.name + ' both finished in about ' + fmtTime(t1) + '.';
+  } else {
+    const winner = t1 < t2 ? currentRoom.player1 : currentRoom.player2;
+    const loser = t1 < t2 ? currentRoom.player2 : currentRoom.player1;
+    title = winner.name + ' wins this round!';
+    sub = winner.name + ' finished in ' + fmtTime(winner.elapsedMs) + ', ' + loser.name + ' in ' + fmtTime(loser.elapsedMs) + '.';
+  }
+  document.getElementById('win-title').textContent = title;
+  document.getElementById('win-sub').textContent = sub;
+  updatePauseButton();
+  if(justHappened) burstConfettiFullScreen();
+  saveRoom(currentRoom);
+}
+
+document.getElementById('newpuzzle-btn').addEventListener('click', ()=>{
+  if(!currentRoom) return;
+  if(!confirm('Start a fresh pair of puzzles in this room?')) return;
+  const diff = currentRoom.difficulty;
+  const n1 = currentRoom.player1.name, n2 = currentRoom.player2.name;
+  currentRoom.player1 = Object.assign(makePlayerState(diff), {name:n1, running:true});
+  currentRoom.player2 = Object.assign(makePlayerState(diff), {name:n2, running:true});
+  selected = { p1: null, p2: null };
+  document.getElementById('win-banner').classList.add('hidden');
+  document.getElementById('p1-timer').classList.remove('win');
+  document.getElementById('p2-timer').classList.remove('win');
+  buildBoard('p1'); buildBoard('p2');
+  refreshBoard('p1'); refreshBoard('p2');
+  saveRoom(currentRoom);
+  startTicking();
+});
+document.getElementById('again-btn').addEventListener('click', ()=>{
+  document.getElementById('newpuzzle-btn').click();
+});
+
+/* ================= CONFETTI ================= */
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let particles = [];
+let confettiRunning = false;
+const CONFETTI_COLORS = ['#f0a35c', '#49c2b5', '#ef6c86', '#eeecf9', '#8fd8cf'];
+
+function spawnParticles(originX, originY, count, spread){
+  for(let i=0;i<count;i++){
+    const angle = (-Math.PI/2) + (Math.random()-0.5) * spread;
+    const speed = 4 + Math.random()*6;
+    particles.push({
+      x: originX,
+      y: originY,
+      vx: Math.cos(angle)*speed,
+      vy: Math.sin(angle)*speed,
+      size: 5 + Math.random()*5,
+      color: CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)],
+      rotation: Math.random()*360,
+      spin: (Math.random()-0.5) * 12,
+      life: 0,
+      maxLife: 90 + Math.random()*40
+    });
+  }
+  if(!confettiRunning){
+    confettiRunning = true;
+    requestAnimationFrame(animateConfetti);
+  }
+}
+
+function animateConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.vy += 0.15;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rotation += p.spin;
+    p.life++;
+    const fade = Math.max(0, 1 - p.life/p.maxLife);
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation * Math.PI/180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+    ctx.restore();
+  });
+  particles = particles.filter(p => p.life < p.maxLife && p.y < canvas.height + 40);
+  if(particles.length > 0){
+    requestAnimationFrame(animateConfetti);
+  } else {
+    confettiRunning = false;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+}
+
+function burstConfettiFromPanel(panelId){
+  const el = document.getElementById(panelId);
+  const rect = el.getBoundingClientRect();
+  const x = rect.left + rect.width/2;
+  const y = rect.top + Math.min(rect.height*0.3, 160);
+  spawnParticles(x, y, 90, Math.PI*0.9);
+}
+
+function burstConfettiFullScreen(){
+  const w = canvas.width;
+  spawnParticles(w*0.2, canvas.height*0.3, 70, Math.PI*0.9);
+  spawnParticles(w*0.8, canvas.height*0.3, 70, Math.PI*0.9);
+  setTimeout(()=> spawnParticles(w*0.5, canvas.height*0.2, 90, Math.PI*1.1), 200);
+}
+
+/* ================= INIT ================= */
+renderRoomsList();
+
+})();
+</script>
+</body>
+</html>
