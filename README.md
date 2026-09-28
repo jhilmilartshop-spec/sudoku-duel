@@ -1,8 +1,18 @@
 # Sudoku Duel
 
-A small two-player Sudoku game for couples (or anyone) to play side by side on the same screen. No sign-up, no server — it's a single HTML file.
+A small two-player Sudoku game for couples (or anyone). Play **online from two different places**, or side by side on one screen. No sign-up, no server of your own — it's a single HTML file.
 
 **[Play it live](#) once GitHub Pages is enabled — see below.**
+
+## Playing online
+
+1. One person opens the site, enters their name, picks a difficulty and taps **Create room**.
+2. They send the 5-character code (or the **Share invite** link) to their partner.
+3. The partner opens the site, enters their name and the code, and taps **Join room**.
+
+Each player gets their own puzzle and can watch the other's board fill in live, with both timers running. Confetti when you finish, and a winner banner when you both do. If someone drops off, they can rejoin with the same name and code and pick up where they left off. The **Rematch** button starts fresh puzzles.
+
+Online play is peer-to-peer (WebRTC via [PeerJS](https://peerjs.com/)'s free public broker), so there's nothing to host. The room lives only while the host keeps the page open. Some strict networks can block direct connections.
 
 ## Features
 
@@ -11,7 +21,7 @@ A small two-player Sudoku game for couples (or anyone) to play side by side on t
 - Live conflict highlighting (duplicate numbers in a row/column/box are flagged)
 - Confetti when a board is solved, and again when both players finish
 - A winner/tie summary comparing solve times
-- **Rooms**: name a room and it's saved in the browser's local storage, so you can resume a game later or run separate saved rounds for different play sessions on the same device
+- **Same-screen rooms**: name a room and it's saved in the browser's local storage, so you can resume a game later or run separate saved rounds for different play sessions on the same device
 - Three difficulty levels (easy / medium / hard)
 
 ## Running it locally
@@ -49,7 +59,7 @@ git push -u origin main
 
 ## Notes on how rooms work
 
-Everything runs client-side. "Rooms" are saved in the browser's `localStorage`, keyed by room name — there's no account system or cross-device sync. This is built for two people sharing one screen; playing from two separate devices in real time would need a small backend to sync state, which isn't included here.
+In same-screen mode, rooms are saved in the browser's `localStorage`, keyed by room name. Online rooms are temporary and aren't saved.
 
 ## License
 

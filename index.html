@@ -3,31 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#dccff7">
 <title>Sudoku Duel — a two-player puzzle room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #14172b;
-    --bg-alt: #1c2142;
-    --panel: #f4f1fb;
-    --panel-line: #cfc9e8;
-    --given: #e3ddf5;
-    --ink: #eeecf9;
-    --muted: #9490b8;
-    --p1: #f0a35c;
-    --p1-soft: #f0a35c33;
-    --p2: #49c2b5;
-    --p2-soft: #49c2b533;
-    --danger: #ef6c86;
-    --danger-soft: #ef6c8633;
+    /* lilac + butter yellow + blue + crimson orange */
+    --bg: #dccff7;
+    --bg-alt: #f4effe;
+    --input-bg: #fbf9ff;
+    --line: #c9b9f0;
+    --line-strong: #a997e6;
+    --panel: #fff6c9;
+    --panel-line: #c8b8ee;
+    --box-line: #5a54b5;
+    --given: #f9e27e;
+    --ink: #1f2a7a;
+    --ink-strong: #141d5e;
+    --muted: #4f5594;
+    --butter: #fbe68f;
+    --p1: #ee5a24;
+    --p1-ink: #c23a10;
+    --p1-soft: #ee5a2433;
+    --p2: #3b5bdb;
+    --p2-ink: #2f4bc0;
+    --p2-soft: #3b5bdb33;
+    --danger: #c4183c;
+    --danger-soft: #c4183c33;
     --radius: 14px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background: radial-gradient(circle at 20% -10%, #232951 0%, var(--bg) 55%);
+    background: radial-gradient(circle at 12% -8%, #efe6ff 0%, var(--bg) 60%);
     color: var(--ink);
     font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
@@ -52,6 +62,7 @@
     padding: 36px 20px 80px;
   }
   .hidden{ display:none !important; }
+  ::placeholder{ color:#9b9cc9; opacity:1; }
 
   /* ---------- Landing ---------- */
   .hero{
@@ -59,7 +70,7 @@
     margin-bottom: 34px;
   }
   .hero .kicker{
-    color: var(--p2);
+    color: var(--p2-ink);
     font-size: 0.92rem;
     margin-bottom: 6px;
   }
@@ -75,7 +86,7 @@
   }
   .card{
     background: var(--bg-alt);
-    border: 1px solid #2c3260;
+    border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 26px;
   }
@@ -96,8 +107,8 @@
     color: var(--muted);
   }
   .field input[type=text]{
-    background: #10132a;
-    border: 1px solid #34397a;
+    background: var(--input-bg);
+    border: 1px solid var(--line-strong);
     border-radius: 10px;
     padding: 12px 14px;
     color: var(--ink);
@@ -115,23 +126,23 @@
     flex-wrap: wrap;
   }
   .diff-btn{
-    background: #10132a;
-    border: 1px solid #34397a;
+    background: var(--input-bg);
+    border: 1px solid var(--line-strong);
     color: var(--muted);
     padding: 10px 16px;
     border-radius: 999px;
     font-size: 0.88rem;
   }
   .diff-btn.active{
-    background: var(--p2-soft);
-    border-color: var(--p2);
-    color: var(--ink);
+    background: var(--butter);
+    border-color: #e2c24a;
+    color: var(--ink-strong);
   }
   .start-btn{
     margin-top: 22px;
     width: 100%;
-    background: linear-gradient(120deg, var(--p1), var(--p2));
-    color: #14172b;
+    background: #d23d0c;
+    color: #fff;
     font-weight: 600;
     font-size: 1.05rem;
     padding: 15px;
@@ -149,7 +160,7 @@
     align-items:center;
     justify-content: space-between;
     background: var(--bg-alt);
-    border: 1px solid #2c3260;
+    border: 1px solid var(--line);
     border-radius: 12px;
     padding: 14px 16px;
     margin-bottom: 10px;
@@ -159,8 +170,8 @@
   .room-row .meta .sub{ color: var(--muted); font-size: 0.8rem; }
   .room-row .actions{ display:flex; gap: 8px; }
   .pill-btn{
-    background: #10132a;
-    border: 1px solid #34397a;
+    background: var(--input-bg);
+    border: 1px solid var(--line-strong);
     color: var(--ink);
     padding: 8px 14px;
     border-radius: 999px;
@@ -201,7 +212,7 @@
     padding-top: 90px;
     color: var(--muted);
   }
-  .vs-divider .line{ width:1px; flex:1; background: #2c3260; }
+  .vs-divider .line{ width:1px; flex:1; background: var(--line); }
   .vs-divider .vs-label{
     font-family:'Fraunces',serif;
     font-size: 0.95rem;
@@ -209,7 +220,7 @@
 
   .panel{
     background: var(--bg-alt);
-    border: 1px solid #2c3260;
+    border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 18px;
     position: relative;
@@ -227,8 +238,8 @@
     font-size: 1.2rem;
     font-weight: 600;
   }
-  .panel.p1 .pname{ color: var(--p1); }
-  .panel.p2 .pname{ color: var(--p2); }
+  .panel.p1 .pname{ color: var(--p1-ink); }
+  .panel.p2 .pname{ color: var(--p2-ink); }
   .panel-head .status{
     font-size: 0.78rem;
     color: var(--muted);
@@ -240,14 +251,14 @@
     font-weight: 600;
     letter-spacing: 0.02em;
   }
-  .timer.win{ color: var(--p2); }
+  .timer.win{ color: var(--p2-ink); }
 
   .grid9{
     display:grid;
     grid-template-columns: repeat(9, 1fr);
     background: var(--panel-line);
     gap: 1px;
-    border: 2px solid var(--panel-line);
+    border: 2px solid var(--box-line);
     border-radius: 6px;
     overflow: hidden;
     aspect-ratio: 1 / 1;
@@ -258,21 +269,23 @@
     align-items:center;
     justify-content:center;
     font-size: clamp(0.85rem, 2.6vw, 1.15rem);
-    color: #262047;
+    color: var(--ink);
     font-weight: 500;
     position: relative;
     user-select: none;
   }
-  .cell.given{ background: var(--given); font-weight: 700; color: #1a1638; }
+  .cell.given{ background: var(--given); font-weight: 700; color: var(--ink-strong); }
   .cell.editable{ cursor: pointer; }
-  .cell.editable:hover{ background: #eae5fb; }
-  .cell.selected{ outline: 2px solid var(--p1); outline-offset: -2px; z-index: 2; }
+  .cell.editable:hover{ background: #ffee9a; }
+  .cell.selected{ background: #ffea80; outline: 2px solid var(--p1); outline-offset: -2px; z-index: 2; }
   .panel.p2 .cell.selected{ outline-color: var(--p2); }
-  .cell.conflict{ background: var(--danger-soft); color: var(--danger); }
-  .cell.correct-fill{ color: #1a1638; }
-  .cell:nth-child(3n){ border-right: 2px solid var(--panel-line); }
+  .cell.conflict{ background: #ffc8ba; color: #b01e0c; }
+  .panel.p1 .cell:not(.given){ color: var(--p1-ink); }
+  .panel.p2 .cell:not(.given){ color: var(--p2-ink); }
+  .panel.p1 .cell.conflict, .panel.p2 .cell.conflict{ background: #ffc8ba; color: #b01e0c; }
+  .cell:nth-child(3n){ border-right: 2px solid var(--box-line); }
   .cell:nth-child(9n){ border-right: none; }
-  .row-thick{ border-bottom: 2px solid var(--panel-line); }
+  .row-thick{ border-bottom: 2px solid var(--box-line); }
 
   .numpad{
     display:grid;
@@ -281,8 +294,8 @@
     margin-top: 14px;
   }
   .numpad button{
-    background: #10132a;
-    border: 1px solid #34397a;
+    background: var(--input-bg);
+    border: 1px solid var(--line-strong);
     color: var(--ink);
     padding: 10px 0;
     border-radius: 8px;
@@ -296,14 +309,14 @@
     padding: 22px;
     border-radius: var(--radius);
     background: linear-gradient(120deg, var(--p1-soft), var(--p2-soft));
-    border: 1px solid #2c3260;
+    border: 1px solid var(--line);
     text-align:center;
   }
   .win-banner h2{ font-size: 1.5rem; margin-bottom: 6px; }
   .win-banner p{ color: var(--muted); margin: 0 0 16px; }
   .win-banner .again-btn{
     background: var(--ink);
-    color: #14172b;
+    color: var(--butter);
     padding: 12px 22px;
     border-radius: 999px;
     font-weight: 600;
@@ -323,7 +336,44 @@
     padding: 6px 0;
   }
   .top-back:hover{ color: var(--ink); }
+
+  /* ---------- Online mode ---------- */
+  .mode-switch{
+    display:inline-flex; background:var(--input-bg); border:1px solid var(--line-strong);
+    border-radius:999px; padding:4px; gap:4px; margin-bottom:22px;
+  }
+  .mode-btn{ background:none; color:var(--muted); padding:10px 20px; border-radius:999px; font-size:0.92rem; }
+  .mode-btn.active{ background:var(--butter); color:var(--ink-strong); }
+  .online-cols{ display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:20px; }
+  @media (max-width:700px){ .online-cols{ grid-template-columns:1fr; } }
+  .online-box{
+    background:var(--input-bg); border:1px solid var(--line); border-radius:12px;
+    padding:18px; display:flex; flex-direction:column; gap:12px;
+  }
+  .online-box h3{ font-size:1.1rem; }
+  .online-box .sub{ color:var(--muted); font-size:0.85rem; line-height:1.4; margin:0; }
+  .online-box .start-btn{ margin-top:auto; }
+  .online-box input[type=text]{
+    background:var(--bg-alt); border:1px solid var(--line-strong); border-radius:10px;
+    padding:12px 14px; color:var(--ink); font-size:1rem; outline:none;
+  }
+  .online-box input[type=text]:focus{ border-color:var(--p2); }
+  .code-input{ text-transform:uppercase; letter-spacing:0.3em; text-align:center; font-size:1.3rem !important; }
+  .start-btn.alt{ background:var(--p2); }
+  .wait-box{ text-align:center; padding:28px 10px 6px; }
+  .sub-label{ color:var(--muted); font-size:0.85rem; }
+  .code-display{
+    font-family:'Fraunces',Georgia,serif; font-size:clamp(2.4rem,9vw,3.4rem);
+    letter-spacing:0.3em; padding-left:0.3em; margin:6px 0 10px; color:var(--p1-ink);
+  }
+  .muted-p{ color:var(--muted); max-width:38ch; margin:0 auto 18px; line-height:1.5; font-size:0.92rem; }
+  .wait-actions{ display:flex; gap:10px; justify-content:center; }
+  .online-status{ min-height:1.2em; margin-top:16px; color:var(--muted); font-size:0.9rem; text-align:center; }
+  .conn-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:-8px 0 18px; }
+  .conn-status{ font-size:0.82rem; color:var(--muted); }
+  .conn-status.ok{ color:var(--p2-ink); }
 </style>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';document.head.appendChild(s);"></script>
 </head>
 <body>
 
@@ -334,9 +384,55 @@
   <div class="hero">
     <div class="kicker">a small game room for two</div>
     <h1>Sudoku Duel</h1>
-    <p>Sit side by side, each take a board, and see who fills theirs first. Name your room to save it — come back and pick up right where you left off.</p>
+    <p>Each take a board and see who fills theirs first — online from two different places, or side by side on one screen.</p>
   </div>
 
+  <div class="mode-switch">
+    <button class="mode-btn active" data-mode="online">Play online</button>
+    <button class="mode-btn" data-mode="local">Same screen</button>
+  </div>
+
+  <div id="online-setup">
+    <div class="card">
+      <div class="field full">
+        <label for="online-name">Your name</label>
+        <input type="text" id="online-name" placeholder="What should your partner see?" maxlength="20">
+      </div>
+
+      <div class="online-cols" id="online-cols">
+        <div class="online-box">
+          <h3>Start a room</h3>
+          <p class="sub">Pick a difficulty, then send your partner the code.</p>
+          <div class="difficulty-row">
+            <button class="diff-btn" data-diff="easy">Easy</button>
+            <button class="diff-btn active" data-diff="medium">Medium</button>
+            <button class="diff-btn" data-diff="hard">Hard</button>
+          </div>
+          <button class="start-btn" id="create-online-btn">Create room</button>
+        </div>
+        <div class="online-box">
+          <h3>Join a room</h3>
+          <p class="sub">Got a code from your partner? Type it in.</p>
+          <input type="text" id="join-code" class="code-input" placeholder="CODE" maxlength="5" autocapitalize="characters" autocomplete="off">
+          <button class="start-btn alt" id="join-online-btn">Join room</button>
+        </div>
+      </div>
+
+      <div class="wait-box hidden" id="online-wait">
+        <div class="sub-label">Room code</div>
+        <div class="code-display" id="wait-code">-----</div>
+        <p class="muted-p">Send this to your partner and keep this page open. The game starts the moment they join.</p>
+        <div class="wait-actions">
+          <button class="pill-btn" id="share-btn">Share invite</button>
+          <button class="pill-btn" id="cancel-wait-btn">Cancel</button>
+        </div>
+      </div>
+
+      <div class="online-status" id="online-status"></div>
+    </div>
+  </div>
+
+  <div id="local-setup" class="hidden">
   <div class="card">
     <div class="field full">
       <label for="room-name">Room name</label>
@@ -368,6 +464,7 @@
     <div class="sub">Saved games on this device</div>
     <div id="rooms-list"></div>
   </div>
+  </div>
 </div>
 
 <!-- ===================== GAME SCREEN ===================== -->
@@ -379,6 +476,11 @@
       <button class="pill-btn" id="pause-btn">Pause</button>
       <button class="pill-btn" id="newpuzzle-btn">New puzzle</button>
     </div>
+  </div>
+
+  <div class="conn-row">
+    <div class="conn-status" id="conn-status"></div>
+    <button class="pill-btn hidden" id="reconnect-btn">Reconnect</button>
   </div>
 
   <div class="boards">
@@ -519,6 +621,7 @@ function loadRoom(name){
   catch(e){ return null; }
 }
 function saveRoom(room){
+  if(room && room.online) return;
   localStorage.setItem(ROOM_PREFIX+room.roomName, JSON.stringify(room));
   let idx = loadIndex().filter(n => n !== room.roomName);
   idx.unshift(room.roomName);
@@ -541,9 +644,8 @@ const gameScreen = document.getElementById('game-screen');
 let chosenDiff = 'medium';
 document.querySelectorAll('.diff-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
     chosenDiff = btn.dataset.diff;
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.toggle('active', b.dataset.diff === chosenDiff));
   });
 });
 
@@ -625,6 +727,10 @@ document.getElementById('start-btn').addEventListener('click', ()=>{
 function openRoom(name){
   const room = loadRoom(name);
   if(!room) return;
+  showRoom(room);
+}
+
+function showRoom(room){
   currentRoom = room;
   selected = { p1: null, p2: null };
   landingScreen.classList.add('hidden');
@@ -640,6 +746,15 @@ function openRoom(name){
   buildNumpad('p2');
   refreshBoard('p1');
   refreshBoard('p2');
+  const onl = !!room.online;
+  document.getElementById('pause-btn').classList.toggle('hidden', onl);
+  document.getElementById('numpad-p2').classList.toggle('hidden', onl);
+  document.getElementById('newpuzzle-btn').textContent = onl ? 'Rematch' : 'New puzzle';
+  document.getElementById('again-btn').textContent = onl ? 'Rematch' : 'Play again in this room';
+  document.getElementById('p1-timer').classList.toggle('win', !!room.player1.solved);
+  document.getElementById('p2-timer').classList.toggle('win', !!room.player2.solved);
+  if(!onl) teardownOnline();
+  updateConnUI();
   updatePauseButton();
   // resume timers if the room was mid-play and not solved
   if(!room.player1.solved) room.player1.running = true;
@@ -656,9 +771,12 @@ function countBlanks(givenGrid){
 
 document.getElementById('back-btn').addEventListener('click', ()=>{
   stopTicking();
-  if(currentRoom) saveRoom(currentRoom);
+  const wasOnline = isOnline();
+  if(wasOnline){ teardownOnline(); }
+  else if(currentRoom) saveRoom(currentRoom);
   gameScreen.classList.add('hidden');
   landingScreen.classList.remove('hidden');
+  if(wasOnline){ currentRoom = null; resetOnlineUI(); }
   renderRoomsList();
 });
 
@@ -696,6 +814,7 @@ function buildNumpad(key){
 }
 
 function selectCell(key, r, c){
+  if(isOnline() && key === 'p2') return;
   const player = currentRoom[fullKey(key)];
   if(player.given[r][c] || player.solved) return;
   selected[key] = {r,c};
@@ -705,6 +824,7 @@ function selectCell(key, r, c){
 function fullKey(key){ return key==='p1' ? 'player1' : 'player2'; }
 
 function enterValue(key, val){
+  if(isOnline() && key === 'p2') return;
   const sel = selected[key];
   if(!sel) return;
   const player = currentRoom[fullKey(key)];
@@ -713,6 +833,7 @@ function enterValue(key, val){
   refreshBoard(key);
   checkPlayerWin(key);
   saveRoom(currentRoom);
+  if(isOnline()) sendState();
 }
 
 document.addEventListener('keydown', (e)=>{
@@ -759,16 +880,20 @@ function refreshBoard(key){
       const val = player.entries[r][c];
       cell.textContent = val || '';
       cell.classList.toggle('given', !!player.given[r][c]);
-      cell.classList.toggle('editable', !player.given[r][c] && !player.solved);
+      cell.classList.toggle('editable', !player.given[r][c] && !player.solved && !(isOnline() && key === 'p2'));
       const isSel = selected[key] && selected[key].r===r && selected[key].c===c;
       cell.classList.toggle('selected', !!isSel);
       const conflict = !player.given[r][c] && conflictsFor(player.entries, r, c, val);
       cell.classList.toggle('conflict', conflict);
     }
   }
-  document.getElementById(key+'-status').textContent = player.solved
-    ? 'solved!'
-    : 'playing';
+  let filled = 0, total = 0;
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    if(!player.given[r][c]){ total++; if(player.entries[r][c]) filled++; }
+  }
+  let statusText = player.solved ? 'solved!' : 'playing \u00b7 ' + filled + '/' + total;
+  if(key === 'p2' && isOnline() && online && !online.partnerConnected && !player.solved) statusText = 'disconnected';
+  document.getElementById(key+'-status').textContent = statusText;
   document.getElementById('panel-'+key).classList.toggle('solved', player.solved);
 }
 
@@ -790,6 +915,7 @@ function startTicking(){
     });
     document.getElementById('p1-timer').textContent = fmtTime(currentRoom.player1.elapsedMs);
     document.getElementById('p2-timer').textContent = fmtTime(currentRoom.player2.elapsedMs);
+    if(isOnline() && Date.now() - lastOnlineSend >= 1000) sendState();
     if(changed && Math.floor(currentRoom.player1.elapsedMs/2000) !== lastSaveTick){
       lastSaveTick = Math.floor(currentRoom.player1.elapsedMs/2000);
       saveRoom(currentRoom);
@@ -818,13 +944,16 @@ function updatePauseButton(){
 
 /* ---------- Win detection ---------- */
 function boardMatchesSolution(player){
+  // Accept any valid completed grid (some puzzles have more than one solution)
   for(let r=0;r<9;r++) for(let c=0;c<9;c++){
-    if(player.entries[r][c] !== player.solution[r][c]) return false;
+    const v = player.entries[r][c];
+    if(!v || conflictsFor(player.entries, r, c, v)) return false;
   }
   return true;
 }
 
 function checkPlayerWin(key){
+  if(isOnline() && key === 'p2') return;
   const player = currentRoom[fullKey(key)];
   if(player.solved) return;
   if(boardMatchesSolution(player)){
@@ -862,6 +991,7 @@ function checkOverallWin(justHappened){
 
 document.getElementById('newpuzzle-btn').addEventListener('click', ()=>{
   if(!currentRoom) return;
+  if(isOnline()){ requestRematch(); return; }
   if(!confirm('Start a fresh pair of puzzles in this room?')) return;
   const diff = currentRoom.difficulty;
   const n1 = currentRoom.player1.name, n2 = currentRoom.player2.name;
@@ -889,7 +1019,7 @@ window.addEventListener('resize', resizeCanvas);
 
 let particles = [];
 let confettiRunning = false;
-const CONFETTI_COLORS = ['#f0a35c', '#49c2b5', '#ef6c86', '#eeecf9', '#8fd8cf'];
+const CONFETTI_COLORS = ['#ee5a24', '#3b5bdb', '#fbe68f', '#ffd84d', '#b9a2f0', '#ff8a5c'];
 
 function spawnParticles(originX, originY, count, spread){
   for(let i=0;i<count;i++){
@@ -955,7 +1085,373 @@ function burstConfettiFullScreen(){
   setTimeout(()=> spawnParticles(w*0.5, canvas.height*0.2, 90, Math.PI*1.1), 200);
 }
 
+/* ================= ONLINE (peer-to-peer via PeerJS) ================= */
+const PEER_PREFIX = 'sudokuduel-';
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+let online = null;
+let lastOnlineSend = 0;
+
+function byId(id){ return document.getElementById(id); }
+function isOnline(){ return !!(currentRoom && currentRoom.online); }
+function setOnlineStatus(msg){ byId('online-status').textContent = msg || ''; }
+
+function genCode(){
+  let s = '';
+  for(let i=0;i<5;i++) s += CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];
+  return s;
+}
+function getOnlineName(){
+  const n = byId('online-name').value.trim().slice(0,20) || 'Player';
+  try{ localStorage.setItem('sudokuDuel_name', n); }catch(e){}
+  return n;
+}
+function validGrid(g){
+  return Array.isArray(g) && g.length===9 && g.every(r => Array.isArray(r) && r.length===9 && r.every(v => Number.isInteger(v) && v>=0 && v<=9));
+}
+function stateFromPuzzle(puzzle, solution){
+  return {
+    puzzle,
+    solution: solution || null,
+    given: puzzle.map(row => row.map(v => v!==0)),
+    entries: puzzle.map(r => r.slice()),
+    elapsedMs: 0,
+    running: false,
+    solved: false,
+    solvedAt: null
+  };
+}
+function applyEntries(state, entries){
+  for(let r=0;r<9;r++) for(let c=0;c<9;c++){
+    if(state.given[r][c]) continue;
+    const v = entries && entries[r] ? entries[r][c] : 0;
+    state.entries[r][c] = (Number.isInteger(v) && v>=0 && v<=9) ? v : 0;
+  }
+}
+
+function send(msg){
+  if(online && online.conn && online.conn.open){
+    try{ online.conn.send(msg); }catch(e){}
+  }
+}
+function sendState(){
+  if(!isOnline()) return;
+  const p = currentRoom.player1;
+  lastOnlineSend = Date.now();
+  send({ t:'state', entries:p.entries, elapsedMs:Math.round(p.elapsedMs), solved:p.solved });
+}
+
+/* ----- rounds ----- */
+function beginRound(mine, partner){
+  const room = {
+    roomName: 'Room ' + online.code,
+    difficulty: online.difficulty,
+    online: true,
+    player1: Object.assign(mine, { name: online.myName }),
+    player2: Object.assign(partner, { name: online.partnerName })
+  };
+  showRoom(room);
+  sendState();
+}
+
+function startOnlineRound(){
+  if(!online || !online.isHost) return;
+  const mine = makePlayerState(online.difficulty);
+  const theirs = makePlayerState(online.difficulty);
+  online.guestData = { puzzle: theirs.puzzle, solution: theirs.solution };
+  send({
+    t:'start',
+    difficulty: online.difficulty,
+    hostName: online.myName,
+    yourPuzzle: theirs.puzzle,
+    yourSolution: theirs.solution,
+    theirPuzzle: mine.puzzle
+  });
+  beginRound(mine, stateFromPuzzle(theirs.puzzle, null));
+}
+
+function resumeGuest(){
+  const room = currentRoom, p2 = room.player2;
+  send({
+    t:'start',
+    difficulty: online.difficulty,
+    hostName: online.myName,
+    yourPuzzle: online.guestData.puzzle,
+    yourSolution: online.guestData.solution,
+    theirPuzzle: room.player1.puzzle,
+    resume: { entries:p2.entries, elapsedMs:Math.round(p2.elapsedMs), solved:p2.solved }
+  });
+  p2.name = online.partnerName;
+  byId('p2-label').textContent = online.partnerName;
+  if(!p2.solved) p2.running = true;
+  refreshBoard('p2');
+  updateConnUI();
+  sendState();
+}
+
+function handleStart(d){
+  if(!validGrid(d.yourPuzzle) || !validGrid(d.yourSolution) || !validGrid(d.theirPuzzle)) return;
+  online.partnerName = String(d.hostName || 'Partner').slice(0,20);
+  online.difficulty = ['easy','medium','hard'].includes(d.difficulty) ? d.difficulty : 'medium';
+  online.partnerConnected = true;
+  online.error = '';
+  const mine = stateFromPuzzle(d.yourPuzzle, d.yourSolution);
+  if(d.resume && typeof d.resume === 'object'){
+    applyEntries(mine, d.resume.entries);
+    mine.elapsedMs = Number(d.resume.elapsedMs) || 0;
+    mine.solved = !!d.resume.solved;
+  }
+  beginRound(mine, stateFromPuzzle(d.theirPuzzle, null));
+}
+
+function handleState(d){
+  if(!isOnline()) return;
+  const p2 = currentRoom.player2;
+  applyEntries(p2, d.entries);
+  if(Number.isFinite(d.elapsedMs)) p2.elapsedMs = d.elapsedMs;
+  if(d.solved && !p2.solved){
+    p2.solved = true;
+    p2.running = false;
+    byId('p2-timer').classList.add('win');
+    refreshBoard('p2');
+    burstConfettiFromPanel('panel-p2');
+    checkOverallWin(true);
+  } else {
+    if(!p2.solved) p2.running = true;
+    refreshBoard('p2');
+  }
+  byId('p2-timer').textContent = fmtTime(p2.elapsedMs);
+}
+
+function requestRematch(){
+  if(!online || !online.partnerConnected){
+    alert('Your partner needs to be connected to start a new round.');
+    return;
+  }
+  const finished = currentRoom.player1.solved && currentRoom.player2.solved;
+  if(!finished && !confirm('Start a new round with fresh puzzles?')) return;
+  if(online.isHost){
+    startOnlineRound();
+  } else {
+    send({ t:'rematchReq' });
+    byId('conn-status').textContent = 'Rematch requested\u2026';
+  }
+}
+
+/* ----- messages & connection lifecycle ----- */
+function onMessage(conn, d){
+  if(!d || typeof d !== 'object' || !online) return;
+
+  if(d.t === 'hello' && online.isHost){
+    const name = String(d.name || 'Partner').slice(0,20);
+    const rejoin = !!(online.guestData && currentRoom && currentRoom.online && name === online.partnerName);
+    if(online.conn && online.conn !== conn && online.conn.open && !rejoin){
+      try{ conn.send({ t:'busy' }); }catch(e){}
+      setTimeout(()=>{ try{ conn.close(); }catch(e){} }, 500);
+      return;
+    }
+    const old = online.conn;
+    online.conn = conn;
+    if(old && old !== conn){ try{ old.close(); }catch(e){} }
+    online.partnerName = name;
+    online.partnerConnected = true;
+    if(rejoin) resumeGuest(); else startOnlineRound();
+    return;
+  }
+
+  if(conn !== online.conn) return;
+
+  if(d.t === 'start' && !online.isHost) handleStart(d);
+  else if(d.t === 'state') handleState(d);
+  else if(d.t === 'rematchReq' && online.isHost) startOnlineRound();
+  else if(d.t === 'busy'){
+    teardownOnline();
+    setOnlineStatus('That room already has two players.');
+  }
+}
+
+function onConnClosed(conn){
+  if(!online || conn !== online.conn) return;
+  online.partnerConnected = false;
+  if(isOnline()){
+    currentRoom.player2.running = false;
+    refreshBoard('p2');
+    updateConnUI();
+  } else if(!online.isHost){
+    setOnlineStatus('The connection closed. Try joining again.');
+  }
+}
+
+function teardownOnline(){
+  const o = online;
+  online = null;
+  if(o){
+    try{ if(o.conn) o.conn.close(); }catch(e){}
+    try{ if(o.peer) o.peer.destroy(); }catch(e){}
+  }
+}
+
+function keepPeerAlive(peer){
+  peer.on('disconnected', ()=>{
+    if(!peer.destroyed){ try{ peer.reconnect(); }catch(e){} }
+  });
+}
+
+/* ----- host: create a room ----- */
+function createOnlineRoom(){
+  if(typeof Peer === 'undefined'){
+    setOnlineStatus('Could not load the connection library. Check your internet and reload the page.');
+    return;
+  }
+  const name = getOnlineName();
+  teardownOnline();
+  setOnlineStatus('Setting up your room\u2026');
+  const attempt = (tries)=>{
+    const code = genCode();
+    const peer = new Peer(PEER_PREFIX + code);
+    const o = online = {
+      peer, conn:null, isHost:true, code, myName:name, partnerName:'Partner',
+      difficulty:chosenDiff, partnerConnected:false, guestData:null, error:''
+    };
+    peer.on('open', ()=>{ if(online === o) showWaitUI(code); });
+    peer.on('connection', conn=>{
+      conn.on('data', d => onMessage(conn, d));
+      conn.on('close', () => onConnClosed(conn));
+      conn.on('error', () => onConnClosed(conn));
+    });
+    keepPeerAlive(peer);
+    peer.on('error', err=>{
+      if(online !== o) return;
+      if(err.type === 'unavailable-id' && tries < 5){
+        try{ peer.destroy(); }catch(e){}
+        attempt(tries + 1);
+      } else {
+        setOnlineStatus('Could not set up the room (' + err.type + '). Please try again.');
+      }
+    });
+  };
+  attempt(0);
+}
+
+/* ----- guest: join a room ----- */
+function connectAsGuest(code, name){
+  if(typeof Peer === 'undefined'){
+    setOnlineStatus('Could not load the connection library. Check your internet and reload the page.');
+    return;
+  }
+  const knownPartner = (currentRoom && currentRoom.online) ? currentRoom.player2.name : 'Partner';
+  teardownOnline();
+  const peer = new Peer();
+  const o = online = {
+    peer, conn:null, isHost:false, code, myName:name, partnerName:knownPartner,
+    difficulty:'medium', partnerConnected:false, guestData:null, error:''
+  };
+  updateConnUI();
+  const fail = (msg)=>{
+    if(online !== o) return;
+    if(isOnline()){ o.error = msg; updateConnUI(); } else setOnlineStatus(msg);
+  };
+  peer.on('open', ()=>{
+    if(online !== o) return;
+    const conn = peer.connect(PEER_PREFIX + code, { reliable:true });
+    o.conn = conn;
+    conn.on('open', ()=> conn.send({ t:'hello', name }));
+    conn.on('data', d => onMessage(conn, d));
+    conn.on('close', () => onConnClosed(conn));
+    conn.on('error', () => onConnClosed(conn));
+    setTimeout(()=>{
+      if(online === o && !o.partnerConnected){
+        fail("Couldn't reach that room. Check the code, and make sure your partner still has the page open.");
+      }
+    }, 12000);
+  });
+  peer.on('error', err=>{
+    if(err.type === 'peer-unavailable') fail('No room found with that code.');
+    else fail('Connection problem (' + err.type + ').');
+  });
+  keepPeerAlive(peer);
+}
+
+function joinOnlineRoom(){
+  const code = byId('join-code').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length !== 5){ setOnlineStatus('Enter the 5-character room code.'); return; }
+  setOnlineStatus('Connecting\u2026');
+  connectAsGuest(code, getOnlineName());
+}
+
+/* ----- UI helpers ----- */
+function showWaitUI(code){
+  byId('online-cols').classList.add('hidden');
+  byId('online-wait').classList.remove('hidden');
+  byId('wait-code').textContent = code;
+  setOnlineStatus('Waiting for your partner to join\u2026');
+}
+function resetOnlineUI(){
+  byId('online-cols').classList.remove('hidden');
+  byId('online-wait').classList.add('hidden');
+  setOnlineStatus('');
+}
+function updateConnUI(){
+  const line = byId('conn-status'), rb = byId('reconnect-btn');
+  if(!isOnline() || !online){
+    line.textContent = '';
+    line.className = 'conn-status';
+    rb.classList.add('hidden');
+    return;
+  }
+  if(online.partnerConnected){
+    line.textContent = '\u25cf ' + online.partnerName + ' is connected \u00b7 room ' + online.code;
+    line.className = 'conn-status ok';
+    rb.classList.add('hidden');
+  } else {
+    line.className = 'conn-status';
+    line.textContent = online.isHost
+      ? '\u25cb ' + online.partnerName + ' disconnected \u2014 they can rejoin with room ' + online.code
+      : '\u25cb Disconnected from ' + online.partnerName + (online.error ? ' \u2014 ' + online.error : '');
+    rb.classList.toggle('hidden', online.isHost);
+  }
+}
+function inviteLink(code){
+  const base = location.protocol === 'file:' ? location.href.split('?')[0] : location.origin + location.pathname;
+  return base + '?room=' + code;
+}
+function setMode(mode){
+  byId('online-setup').classList.toggle('hidden', mode !== 'online');
+  byId('local-setup').classList.toggle('hidden', mode !== 'local');
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+}
+
+document.querySelectorAll('.mode-btn').forEach(b => b.addEventListener('click', ()=> setMode(b.dataset.mode)));
+byId('create-online-btn').addEventListener('click', createOnlineRoom);
+byId('join-online-btn').addEventListener('click', joinOnlineRoom);
+byId('cancel-wait-btn').addEventListener('click', ()=>{ teardownOnline(); resetOnlineUI(); });
+byId('reconnect-btn').addEventListener('click', ()=>{
+  if(online && !online.isHost) connectAsGuest(online.code, online.myName);
+});
+byId('share-btn').addEventListener('click', async ()=>{
+  if(!online) return;
+  const link = inviteLink(online.code);
+  const text = 'Join me for a game of Sudoku Duel! Room code: ' + online.code;
+  try{
+    if(navigator.share){ await navigator.share({ title:'Sudoku Duel', text, url:link }); return; }
+  }catch(e){ if(e && e.name === 'AbortError') return; }
+  try{
+    await navigator.clipboard.writeText(text + ' ' + link);
+    setOnlineStatus('Invite copied \u2014 paste it to your partner.');
+  }catch(e){
+    setOnlineStatus('Share this link: ' + link);
+  }
+});
+
 /* ================= INIT ================= */
+try{ byId('online-name').value = localStorage.getItem('sudokuDuel_name') || ''; }catch(e){}
+setMode('online');
+(function(){
+  const room = new URLSearchParams(location.search).get('room');
+  if(room){
+    byId('join-code').value = room.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5);
+    setOnlineStatus('Enter your name and tap Join room to jump in.');
+  }
+})();
 renderRoomsList();
 
 })();
